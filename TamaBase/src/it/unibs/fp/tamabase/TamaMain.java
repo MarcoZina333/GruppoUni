@@ -1,7 +1,11 @@
 package it.unibs.fp.tamabase;
 
-import it.unibs.fp.mylib.*;
-
+import it.unibs.fp.myutil.*;
+/**
+ * Classe applicativa del tamagotchi
+ * @author Marco, Pietro
+ *
+ */
 public class TamaMain {
 
 	public static final String MSG_INPUT_CAREZZE = "Inserire numero carezze: ";
@@ -10,6 +14,7 @@ public class TamaMain {
 	public static final String MSG_INPUT_AFFETTO = "Inserire la soddisfazione di ";
 	public static final String MSG_INPUT_NOME = "Che nome vuoi dare al tuo Tamagotchi? ";
 	public static final String MSG_BENVENUTO = "Benvenuti nel gioco del Tamagotchi!\n";
+
 
 	public static void main(String[] args) {
 		System.out.println(MSG_BENVENUTO);
@@ -25,19 +30,19 @@ public class TamaMain {
 			System.out.println(myTama.toString());
 			scelta = menu.scegli();
 			switch (scelta) {
-			case 1: //dai biscotti
+			case 1: //dai biscotti (numero casuale)
 				numBiscotti = NumeriCasuali.estraiIntero(1, 20);
 				System.out.println("Dai "+ numBiscotti + " biscotti a " + myTama.getNome());
-				myTama.daiBiscotti(numBiscotti);
+				myTama.riceviBiscotti(numBiscotti);
 				break;
-			case 2: //dai carezze
+			case 2: //dai carezze (numero casuale)
 				numCarezze = NumeriCasuali.estraiIntero(1, 20);
 				System.out.println("Dai "+ numCarezze + " carezze a " + myTama.getNome());
-				myTama.daiCarezze(numCarezze);
+				myTama.riceviCarezze(numCarezze);
 				break;
 			}
 		}
-		while (scelta != 0 && !myTama.isMorto());
+		while (scelta != 0 && !myTama.sonoMorto());
 		System.out.println(myTama.toString());
 		
 	}

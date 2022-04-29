@@ -5,7 +5,6 @@ public class Tamagotchi {
 	private static final double MODIFICATORE_BISCOTTI = 1.3;
 	private static final int SODDISFAZIONE_DEFAULT = 50;
 	private static final int SAZIETA_DEFAULT = 50;
-	private double incrementoBiscotto = 1.6;
 	public static final double FATTORE_BISCOTTI = 4;
 	public static final double FATTORE_CAREZZE = 2;
 	public static final int SAZIETA_MIN = 0;
@@ -22,6 +21,10 @@ public class Tamagotchi {
 	private String nome;
 	private double sazieta;
 	private double soddisfazione;
+	/**
+	 * moltiplicatore utilizzato ogni volta che si da un biscotto al Tamagotchi
+	 */
+	private double incrementoBiscotto = 1.6;
 	
 	/**
 	 * Costruttore di Tamagotchi 
@@ -64,6 +67,13 @@ public class Tamagotchi {
 		return sazieta;
 	}
 
+	/**
+	 * Funzione per aggiornare incrementoBiscotti in base alla sazieta attuale, piu è sazio, meno si sazia
+	 */
+	public void aggiornaFattoreBiscotti() {
+		incrementoBiscotto = MODIFICATORE_BISCOTTI - sazieta / DENOMINATORE_BISCOTTI;
+	}
+	
 	public void setSazieta(double sazieta) {
 		this.sazieta = TamaUtility.doubleInRange(sazieta, SAZIETA_MIN, SAZIETA_MAX);
 		aggiornaFattoreBiscotti();
@@ -73,6 +83,11 @@ public class Tamagotchi {
 		return soddisfazione;
 	}
 	
+	/**
+	 * Setter per entrambi gli attributi di sazieta e soddisfazione
+	 * @param sazieta
+	 * @param soddisfazione
+	 */
 	public void setSazietaESoddisfazione(double sazieta, double soddisfazione) {
 		this.sazieta = TamaUtility.doubleInRange(sazieta, SAZIETA_MIN, SAZIETA_MAX);
 		aggiornaFattoreBiscotti();
@@ -83,7 +98,12 @@ public class Tamagotchi {
 		this.soddisfazione = TamaUtility.doubleInRange(soddisfazione, SODDISFAZIONE_MIN, SODDISFAZIONE_MAX);
 	}
 	
-	public void daiBiscotti(int numBiscotti) {
+	/**
+	 * Metodo contenente l'algoritmo che aumenta la sazieta e diminuisce la soddisfazione in base ai biscotti dati.
+	 * L'incremento alla sazieta varia in base alla sazieta attuale del Tamagotchi
+	 * @param numBiscotti numero di biscotti che si vuol dare al Tamagotchi
+	 */
+	public void riceviBiscotti(int numBiscotti) {
 		for (int i = 0; i < numBiscotti; i++) {
 			aggiornaFattoreBiscotti();
 			this.sazieta = Math.min(SAZIETA_MAX, sazieta * incrementoBiscotto);
@@ -95,44 +115,62 @@ public class Tamagotchi {
 		aggiornaFattoreBiscotti();
 		return incrementoBiscotto;
 	}
-
-	public void daiCarezze(int numCarezze) {
+	
+	/**
+	 * Metodo contenente l'algoritmo che diminuisce la sazieta e aumenta la soddisfazione in base alle carezze date.
+	 * @param numBiscotti numero di biscotti che si vuol dare al Tamagotchi
+	 */
+	public void riceviCarezze(int numCarezze) {
 		this.soddisfazione = Math.min(SODDISFAZIONE_MAX, soddisfazione + numCarezze);
 		this.sazieta = Math.max(SAZIETA_MIN, sazieta - numCarezze/FATTORE_CAREZZE);
 		aggiornaFattoreBiscotti();
 	}
 	
-	public boolean isFelice() {
+	/**
+	 * 
+	 * @return true se la sazieta del Tamagotchi sta in un range prestabilito (SAZIETA_SOGLIA_INF, SAZIETA_SOGLIA_SUP) e se ha almeno una soddisfazione minima; false altrimenti
+	 */
+	public boolean sonoFelice() {
 		return (TamaUtility.isInRange(sazieta, SAZIETA_SOGLIA_INF, SAZIETA_SOGLIA_SUP) && this.soddisfazione > SODDISFAZIONE_SOGLIA_FELICE);
 	}
-	
-	public boolean isTriste() {
+	/**
+	 * 
+	 * @return true se la sazieta del Tamagotchi non sta in un range prestabilito (SAZIETA_SOGLIA_INF, SAZIETA_SOGLIA_SUP) o la soddisfazione sta sotto una certa soglia; false altrimenti
+	 */
+	public boolean sonoTriste() {
 		return (this.sazieta < SAZIETA_SOGLIA_INF || this.sazieta > SAZIETA_SOGLIA_SUP || this.soddisfazione < SODDISFAZIONE_SOGLIA_INFELICE);
 	}
-
-	public boolean isMorto() {
+	
+	/**
+	 * 
+	 * @return true se la sazieta ha raggiunto la soglia minima o massima o la soddisfazione ha raggiunto la soglia massima
+	 */
+	public boolean sonoMorto() {
 		return (this.sazieta == SAZIETA_MIN || this.sazieta == SAZIETA_MAX || this.soddisfazione == SODDISFAZIONE_MIN);
 	}
 	
+	/**
+	 * 
+	 * @return il double che indica la media aritmetica tra sazieta e benessere e che indica il grado generale di benessere del Tamagotchi
+	 */
 	public double getBenessere() {
 		return (sazieta + soddisfazione)/2;
 	}
 	
-	public void aggiornaFattoreBiscotti() {
-		incrementoBiscotto = MODIFICATORE_BISCOTTI - sazieta / DENOMINATORE_BISCOTTI;
-	}
-
+	/**
+	 * @return la String contenente tutte le informazioni riguardo lo stato attuale del Tamagotchi
+	 */
 	public String toString() {
 		StringBuffer descrizione = new StringBuffer();
 		descrizione.append("\nNome: " + nome);
 		descrizione.append(String.format("\nSazieta: %.2f", sazieta));
 		descrizione.append(String.format("\nSoddisfazione: %.2f", soddisfazione));
 		descrizione.append(String.format("\nGrado di benessere: %.2f", getBenessere()));
-		if (this.isMorto())
+		if (this.sonoMorto())
 			descrizione.append(MSG_MORTO);
-		else if (this.isFelice())
+		else if (this.sonoFelice())
 			descrizione.append(MSG_FELICE);
-		else if (this.isTriste())
+		else if (this.sonoTriste())
 				descrizione.append(MSG_INFELICE);
 		return descrizione.toString();
 	}
